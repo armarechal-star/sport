@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getExercises, saveExercises, uid } from '../store'
+import { getExercises, saveExercises, resetExercises, uid } from '../store'
 
 const CATEGORIES = ['Poitrine', 'Dos', 'Épaules', 'Bras', 'Jambes', 'Abdos', 'Cardio', 'Autre']
 
@@ -81,7 +81,14 @@ export default function ExerciseLibrary() {
     <div className="page">
       <div className="page-header">
         <div className="page-title">Exercices</div>
-        <button className="btn btn-primary btn-sm" onClick={() => setModal('new')}>+ Ajouter</button>
+        <div className="row" style={{ gap: 6 }}>
+          <button className="btn btn-secondary btn-sm" onClick={() => {
+            if (!confirm('Réinitialiser avec les 50 exercices par défaut ? Tes exercices perso seront supprimés.')) return
+            const list = resetExercises()
+            setExercises(list)
+          }}>↺</button>
+          <button className="btn btn-primary btn-sm" onClick={() => setModal('new')}>+ Ajouter</button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 12, marginBottom: 8 }}>

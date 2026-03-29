@@ -100,6 +100,12 @@ export function saveExercises(list) {
   save(KEYS.exercises, list)
 }
 
+export function resetExercises() {
+  save(KEYS.exercises, SAMPLE_EXERCISES)
+  save(KEYS.exercisesVersion, EXERCISES_VERSION)
+  return SAMPLE_EXERCISES
+}
+
 export function getPrograms() {
   return load(KEYS.programs, [])
 }
