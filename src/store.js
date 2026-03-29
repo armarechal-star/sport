@@ -1,7 +1,10 @@
 // Simple localStorage-based store
 
+const EXERCISES_VERSION = 2 // Incrémenter pour forcer la mise à jour des exercices par défaut
+
 const KEYS = {
   exercises: 'wt_exercises',
+  exercisesVersion: 'wt_exercises_version',
   programs: 'wt_programs',
   sessions: 'wt_sessions',
 }
@@ -80,11 +83,15 @@ function save(key, data) {
 }
 
 export function getExercises() {
+  const storedVersion = load(KEYS.exercisesVersion, 0)
   const stored = load(KEYS.exercises, null)
-  // Mise à jour auto si c'était encore le mini sample initial (≤6 exos)
-  if (!stored || stored.length <= 6) {
-    save(KEYS.exercises, SAMPLE_EXERCISES)
-    return SAMPLE_EXERCISES
+  if (!stored || storedVersion < EXERCISES_VERSION) {
+    // Garder les exercices perso (id non numérique) et ajouter les 50 par défaut
+    const custom = stored ? stored.filter(e => isNaN(Number(e.id))) : []
+    const merged = [...SAMPLE_EXERCISES, ...custom]
+    save(KEYS.exercises, merged)
+    save(KEYS.exercisesVersion, EXERCISES_VERSION)
+    return merged
   }
   return stored
 }
