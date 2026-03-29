@@ -8,39 +8,6 @@ const XIcon = () => (
 )
 
 function ExerciseItem({ item, exercises, onUpdate, onRemove, index }) {
-  function toggleVariableSets(checked) {
-    if (checked) {
-      const setsData = Array.from({ length: item.sets }, () => ({
-        id: uid(), reps: item.reps, weight: item.weight,
-      }))
-      onUpdate({ ...item, variableSets: true, setsData })
-    } else {
-      onUpdate({ ...item, variableSets: false })
-    }
-  }
-
-  function updateSetData(sIdx, key, val) {
-    onUpdate({ ...item, setsData: item.setsData.map((s, i) => i === sIdx ? { ...s, [key]: val } : s) })
-  }
-
-  function addSetData() {
-    const last = item.setsData[item.setsData.length - 1]
-    onUpdate({
-      ...item,
-      sets: item.sets + 1,
-      setsData: [...item.setsData, { id: uid(), reps: last?.reps || '', weight: last?.weight || '' }],
-    })
-  }
-
-  function removeSetData(sIdx) {
-    if (item.setsData.length <= 1) return
-    onUpdate({
-      ...item,
-      sets: item.sets - 1,
-      setsData: item.setsData.filter((_, i) => i !== sIdx),
-    })
-  }
-
   return (
     <div className="card" style={{ padding: 12, marginBottom: 8 }}>
       <div className="row-between" style={{ marginBottom: 8 }}>
@@ -55,67 +22,28 @@ function ExerciseItem({ item, exercises, onUpdate, onRemove, index }) {
         </select>
       </div>
 
-      {!item.variableSets && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 10 }}>
-          <div>
-            <label>Séries</label>
-            <input type="number" className="set-input" value={item.sets} min="1"
-              onChange={e => onUpdate({ ...item, sets: parseInt(e.target.value) || 1 })} />
-          </div>
-          <div>
-            <label>Reps</label>
-            <input className="set-input" value={item.reps} placeholder="10"
-              onChange={e => onUpdate({ ...item, reps: e.target.value })} />
-          </div>
-          <div>
-            <label>Charge (kg)</label>
-            <input className="set-input" value={item.weight} placeholder="—"
-              onChange={e => onUpdate({ ...item, weight: e.target.value })} />
-          </div>
-          <div>
-            <label>Pause (s)</label>
-            <input type="number" className="set-input" value={item.rest} min="0"
-              onChange={e => onUpdate({ ...item, rest: parseInt(e.target.value) || 0 })} />
-          </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+        <div>
+          <label>Séries</label>
+          <input type="number" className="set-input" value={item.sets} min="1"
+            onChange={e => onUpdate({ ...item, sets: parseInt(e.target.value) || 1 })} />
         </div>
-      )}
-
-      {item.variableSets && (
-        <div style={{ marginBottom: 10 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 1fr 28px', gap: 6, marginBottom: 4 }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center' }}>#</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center' }}>Reps</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center' }}>Kg</div>
-            <div />
-          </div>
-          {item.setsData.map((s, sIdx) => (
-            <div key={s.id} style={{ display: 'grid', gridTemplateColumns: '28px 1fr 1fr 28px', gap: 6, marginBottom: 6 }}>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', paddingTop: 8 }}>{sIdx + 1}</div>
-              <input className="set-input" value={s.reps} placeholder="10"
-                onChange={e => updateSetData(sIdx, 'reps', e.target.value)} />
-              <input className="set-input" value={s.weight} placeholder="—"
-                onChange={e => updateSetData(sIdx, 'weight', e.target.value)} />
-              <button className="btn btn-ghost btn-sm" style={{ color: '#e94560', padding: '4px' }}
-                onClick={() => removeSetData(sIdx)}>−</button>
-            </div>
-          ))}
-          <div style={{ display: 'flex', gap: 8, marginTop: 4, alignItems: 'center' }}>
-            <button className="btn btn-secondary btn-sm" onClick={addSetData}>+ Série</button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-              <label style={{ margin: 0, whiteSpace: 'nowrap' }}>Pause (s)</label>
-              <input type="number" className="set-input" value={item.rest} min="0"
-                onChange={e => onUpdate({ ...item, rest: parseInt(e.target.value) || 0 })} />
-            </div>
-          </div>
+        <div>
+          <label>Reps</label>
+          <input className="set-input" value={item.reps} placeholder="10"
+            onChange={e => onUpdate({ ...item, reps: e.target.value })} />
         </div>
-      )}
-
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer', color: 'var(--text-muted)' }}>
-        <input type="checkbox" checked={!!item.variableSets}
-          onChange={e => toggleVariableSets(e.target.checked)}
-          style={{ width: 'auto', margin: 0 }} />
-        Charges différentes par série
-      </label>
+        <div>
+          <label>Charge (kg)</label>
+          <input className="set-input" value={item.weight} placeholder="—"
+            onChange={e => onUpdate({ ...item, weight: e.target.value })} />
+        </div>
+        <div>
+          <label>Pause (s)</label>
+          <input type="number" className="set-input" value={item.rest} min="0"
+            onChange={e => onUpdate({ ...item, rest: parseInt(e.target.value) || 0 })} />
+        </div>
+      </div>
     </div>
   )
 }
@@ -201,7 +129,6 @@ function ProgramModal({ prog, onSave, onClose }) {
       id: uid(), type: 'exercise',
       exerciseId: exercises[0]?.id || '',
       sets: 3, reps: '10', weight: '', rest: 90,
-      variableSets: false, setsData: [],
     }])
   }
 
@@ -334,7 +261,7 @@ export default function Programs({ onStartSession }) {
               </span>
             ) : (
               <span key={it.id} className="badge badge-accent">
-                {exName(it.exerciseId)} · {it.variableSets ? `${it.setsData?.length || it.sets}× var.` : `${it.sets}×${it.reps}`}
+                {exName(it.exerciseId)} · {it.sets}×{it.reps}
               </span>
             ))}
           </div>

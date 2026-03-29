@@ -55,9 +55,7 @@ function buildSessionData(program) {
         ),
       }
     }
-    const sets = (item.variableSets && item.setsData?.length > 0)
-      ? item.setsData.map(s => ({ id: uid(), reps: s.reps, weight: s.weight, done: false }))
-      : Array.from({ length: item.sets }, () => ({ id: uid(), reps: item.reps, weight: item.weight || '', done: false }))
+    const sets = Array.from({ length: item.sets }, () => ({ id: uid(), reps: item.reps, weight: item.weight || '', done: false }))
     return { type: 'exercise', programItem: item, sets }
   })
 }
