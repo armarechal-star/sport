@@ -1,0 +1,10 @@
+{
+  "name": "WorkoutTracker",
+  "short_name": "Workout",
+  "description": "Suivi d'entraînement",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait"
+}
