@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { getPrograms, savePrograms, getExercises, saveExercises, uid } from '../store'
 
 const CATEGORIES = ['Poitrine', 'Dos', 'Épaules', 'Bras', 'Jambes', 'Abdos', 'Cardio', 'Autre']
@@ -63,7 +64,7 @@ function ExercisePicker({ exercises, value, onChange, onExerciseCreated }) {
         {selected && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{selected.category}</span>}
       </button>
 
-      {open && (
+      {open && createPortal(
         <div className="modal-overlay-full" onClick={() => { setOpen(false); setCreating(false) }}>
           <div className="modal-full" onClick={e => e.stopPropagation()}>
 
@@ -134,7 +135,7 @@ function ExercisePicker({ exercises, value, onChange, onExerciseCreated }) {
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   )
 }
