@@ -68,25 +68,24 @@ function ExercisePicker({ exercises, value, onChange, onExerciseCreated }) {
           <div className="modal-full" onClick={e => e.stopPropagation()}>
 
             <div className="modal-full-header">
-              <div className="modal-handle" style={{ marginBottom: 12 }} />
-              <div className="row-between">
-                <div className="modal-title" style={{ marginBottom: 0 }}>
+              <div className="modal-handle" style={{ marginBottom: 10 }} />
+              <div className="row-between" style={{ marginBottom: creating ? 0 : 10 }}>
+                <button className="btn btn-ghost btn-sm" style={{ color: 'var(--text-muted)' }}
+                  onClick={() => creating ? setCreating(false) : setOpen(false)}>
+                  {creating ? '← Retour' : 'Fermer'}
+                </button>
+                <span style={{ fontWeight: 700, fontSize: 16 }}>
                   {creating ? 'Nouvel exercice' : 'Choisir un exercice'}
-                </div>
-                {!creating && (
-                  <button className="btn btn-primary btn-sm" onClick={() => setCreating(true)}>+ Créer</button>
-                )}
+                </span>
+                {!creating
+                  ? <button className="btn btn-primary btn-sm" onClick={() => setCreating(true)}>+ Créer</button>
+                  : <button className="btn btn-primary btn-sm" onClick={handleCreate}>Ajouter</button>
+                }
               </div>
-
               {!creating && (
                 <>
-                  <input
-                    ref={inputRef}
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Rechercher par nom…"
-                    style={{ marginTop: 10, marginBottom: 8 }}
-                  />
+                  <input ref={inputRef} value={search} onChange={e => setSearch(e.target.value)}
+                    placeholder="Rechercher par nom…" style={{ marginBottom: 8 }} />
                   <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
                     {['Tous', ...CATEGORIES].map(c => (
                       <button key={c} className={`chip ${cat === c ? 'active' : ''}`}
@@ -119,12 +118,10 @@ function ExercisePicker({ exercises, value, onChange, onExerciseCreated }) {
                 </>
               ) : (
                 <>
-                  <div className="form-group">
+                  <div className="form-group" style={{ marginTop: 8 }}>
                     <label>Nom de l'exercice *</label>
-                    <input ref={newNameRef} value={newName}
-                      onChange={e => setNewName(e.target.value)}
-                      placeholder="ex: Curl incliné"
-                      onKeyDown={e => e.key === 'Enter' && handleCreate()} />
+                    <input ref={newNameRef} value={newName} onChange={e => setNewName(e.target.value)}
+                      placeholder="ex: Curl incliné" onKeyDown={e => e.key === 'Enter' && handleCreate()} />
                   </div>
                   <div className="form-group">
                     <label>Catégorie</label>
@@ -133,17 +130,6 @@ function ExercisePicker({ exercises, value, onChange, onExerciseCreated }) {
                     </select>
                   </div>
                 </>
-              )}
-            </div>
-
-            <div className="modal-actions">
-              {creating ? (
-                <>
-                  <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setCreating(false)}>Retour</button>
-                  <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleCreate}>Créer et sélectionner</button>
-                </>
-              ) : (
-                <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setOpen(false)}>Fermer</button>
               )}
             </div>
           </div>
@@ -318,9 +304,11 @@ function ProgramModal({ prog, onSave, onClose }) {
       <div className="modal-full" onClick={e => e.stopPropagation()}>
 
         <div className="modal-full-header">
-          <div className="modal-handle" style={{ marginBottom: 12 }} />
-          <div className="modal-title" style={{ marginBottom: 10 }}>
-            {prog ? 'Modifier le programme' : 'Nouveau programme'}
+          <div className="modal-handle" style={{ marginBottom: 10 }} />
+          <div className="row-between" style={{ marginBottom: 10 }}>
+            <button className="btn btn-ghost btn-sm" style={{ color: 'var(--text-muted)' }} onClick={onClose}>Annuler</button>
+            <span style={{ fontWeight: 700, fontSize: 16 }}>{prog ? 'Modifier' : 'Nouveau programme'}</span>
+            <button className="btn btn-primary btn-sm" onClick={handleSave}>Enregistrer</button>
           </div>
           <input value={name} onChange={e => setName(e.target.value)}
             placeholder="Nom du programme (ex: Push A - Lundi)" autoFocus />
@@ -341,15 +329,10 @@ function ProgramModal({ prog, onSave, onClose }) {
               onExerciseCreated={handleExerciseCreated} />
           ))}
 
-          <div className="row" style={{ gap: 8, marginTop: 4, marginBottom: 8 }}>
+          <div className="row" style={{ gap: 8, marginTop: 4, marginBottom: 80 }}>
             <button className="btn btn-secondary" style={{ flex: 1 }} onClick={addExercise}>+ Exercice</button>
             <button className="btn btn-secondary" style={{ flex: 1, borderColor: '#0f3460', color: '#4da6ff' }} onClick={addCircuit}>⟳ Circuit</button>
           </div>
-        </div>
-
-        <div className="modal-actions">
-          <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose}>Annuler</button>
-          <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleSave}>Enregistrer</button>
         </div>
       </div>
     </div>
