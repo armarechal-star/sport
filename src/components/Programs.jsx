@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { getPrograms, savePrograms, getExercises, uid } from '../store'
+import { getPrograms, savePrograms, getExercises, saveExercises, uid } from '../store'
 
 const CATEGORIES = ['Poitrine', 'Dos', 'Épaules', 'Bras', 'Jambes', 'Abdos', 'Cardio', 'Autre']
 
@@ -9,16 +9,21 @@ const XIcon = () => (
   </svg>
 )
 
-function ExercisePicker({ exercises, value, onChange }) {
+function ExercisePicker({ exercises, value, onChange, onExerciseCreated }) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [cat, setCat] = useState('Tous')
+  const [creating, setCreating] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newCat, setNewCat] = useState('Autre')
   const inputRef = useRef(null)
+  const newNameRef = useRef(null)
   const selected = exercises.find(e => e.id === value)
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 50)
-  }, [open])
+    if (open && !creating) setTimeout(() => inputRef.current?.focus(), 50)
+    if (creating) setTimeout(() => newNameRef.current?.focus(), 50)
+  }, [open, creating])
 
   const filtered = exercises.filter(e => {
     const matchCat = cat === 'Tous' || e.category === cat
@@ -31,6 +36,18 @@ function ExercisePicker({ exercises, value, onChange }) {
     setOpen(false)
     setSearch('')
     setCat('Tous')
+  }
+
+  function handleCreate() {
+    if (!newName.trim()) return
+    const newEx = { id: uid(), name: newName.trim(), category: newCat, youtubeUrl: '', notes: '' }
+    onExerciseCreated(newEx)
+    onChange(newEx.id)
+    setOpen(false)
+    setCreating(false)
+    setNewName('')
+    setNewCat('Autre')
+    setSearch('')
   }
 
   return (
@@ -47,47 +64,87 @@ function ExercisePicker({ exercises, value, onChange }) {
       </button>
 
       {open && (
-        <div className="modal-overlay" onClick={() => setOpen(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxHeight: '80vh' }}>
-            <div className="modal-handle" />
-            <div className="modal-title" style={{ marginBottom: 10 }}>Choisir un exercice</div>
+        <div className="modal-overlay" onClick={() => { setOpen(false); setCreating(false) }}>
+          <div className="modal-full" onClick={e => e.stopPropagation()}>
 
-            <input
-              ref={inputRef}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Rechercher par nom…"
-              style={{ marginBottom: 10 }}
-            />
+            <div className="modal-full-header">
+              <div className="modal-handle" style={{ marginBottom: 12 }} />
+              <div className="row-between">
+                <div className="modal-title" style={{ marginBottom: 0 }}>
+                  {creating ? 'Nouvel exercice' : 'Choisir un exercice'}
+                </div>
+                {!creating && (
+                  <button className="btn btn-primary btn-sm" onClick={() => setCreating(true)}>+ Créer</button>
+                )}
+              </div>
 
-            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 10, marginBottom: 4 }}>
-              {['Tous', ...CATEGORIES].map(c => (
-                <button key={c} className={`chip ${cat === c ? 'active' : ''}`}
-                  style={{ whiteSpace: 'nowrap' }} onClick={() => setCat(c)}>{c}</button>
-              ))}
+              {!creating && (
+                <>
+                  <input
+                    ref={inputRef}
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Rechercher par nom…"
+                    style={{ marginTop: 10, marginBottom: 8 }}
+                  />
+                  <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+                    {['Tous', ...CATEGORIES].map(c => (
+                      <button key={c} className={`chip ${cat === c ? 'active' : ''}`}
+                        style={{ whiteSpace: 'nowrap' }} onClick={() => setCat(c)}>{c}</button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
 
-            <div style={{ overflowY: 'auto', maxHeight: '45vh' }}>
-              {filtered.length === 0 && (
-                <p style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 16 }}>Aucun résultat</p>
+            <div className="modal-full-body">
+              {!creating ? (
+                <>
+                  {filtered.length === 0 && (
+                    <p style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 24 }}>
+                      Aucun résultat — crée un exercice avec "+ Créer"
+                    </p>
+                  )}
+                  {filtered.map(ex => (
+                    <div key={ex.id} onClick={() => pick(ex.id)} style={{
+                      padding: '11px 12px', borderRadius: 8, marginBottom: 6, cursor: 'pointer',
+                      background: ex.id === value ? 'rgba(233,69,96,0.15)' : 'var(--surface2)',
+                      border: '1px solid ' + (ex.id === value ? 'var(--accent)' : 'transparent'),
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}>
+                      <span style={{ fontSize: 14, fontWeight: ex.id === value ? 600 : 400 }}>{ex.name}</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ex.category}</span>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <div className="form-group">
+                    <label>Nom de l'exercice *</label>
+                    <input ref={newNameRef} value={newName}
+                      onChange={e => setNewName(e.target.value)}
+                      placeholder="ex: Curl incliné"
+                      onKeyDown={e => e.key === 'Enter' && handleCreate()} />
+                  </div>
+                  <div className="form-group">
+                    <label>Catégorie</label>
+                    <select value={newCat} onChange={e => setNewCat(e.target.value)}>
+                      {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </>
               )}
-              {filtered.map(ex => (
-                <div key={ex.id}
-                  onClick={() => pick(ex.id)}
-                  style={{
-                    padding: '10px 12px', borderRadius: 8, marginBottom: 4, cursor: 'pointer',
-                    background: ex.id === value ? 'rgba(233,69,96,0.15)' : 'var(--surface2)',
-                    border: '1px solid ' + (ex.id === value ? 'var(--accent)' : 'transparent'),
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}>
-                  <span style={{ fontSize: 14, fontWeight: ex.id === value ? 600 : 400 }}>{ex.name}</span>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ex.category}</span>
-                </div>
-              ))}
             </div>
 
             <div className="modal-actions">
-              <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setOpen(false)}>Fermer</button>
+              {creating ? (
+                <>
+                  <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setCreating(false)}>Retour</button>
+                  <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleCreate}>Créer et sélectionner</button>
+                </>
+              ) : (
+                <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setOpen(false)}>Fermer</button>
+              )}
             </div>
           </div>
         </div>
@@ -96,7 +153,7 @@ function ExercisePicker({ exercises, value, onChange }) {
   )
 }
 
-function ExerciseItem({ item, exercises, onUpdate, onRemove, index }) {
+function ExerciseItem({ item, exercises, onUpdate, onRemove, onExerciseCreated, index }) {
   return (
     <div className="card" style={{ padding: 12, marginBottom: 8 }}>
       <div className="row-between" style={{ marginBottom: 8 }}>
@@ -107,7 +164,8 @@ function ExerciseItem({ item, exercises, onUpdate, onRemove, index }) {
       <div className="form-group" style={{ marginBottom: 8 }}>
         <label>Exercice</label>
         <ExercisePicker exercises={exercises} value={item.exerciseId}
-          onChange={id => onUpdate({ ...item, exerciseId: id })} />
+          onChange={id => onUpdate({ ...item, exerciseId: id })}
+          onExerciseCreated={onExerciseCreated} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
@@ -136,7 +194,7 @@ function ExerciseItem({ item, exercises, onUpdate, onRemove, index }) {
   )
 }
 
-function CircuitItem({ item, exercises, onUpdate, onRemove, index }) {
+function CircuitItem({ item, exercises, onUpdate, onRemove, onExerciseCreated, index }) {
   function addCircuitEx() {
     onUpdate({
       ...item,
@@ -190,7 +248,8 @@ function CircuitItem({ item, exercises, onUpdate, onRemove, index }) {
           <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
             <div style={{ flex: 1 }}>
               <ExercisePicker exercises={exercises} value={ce.exerciseId}
-                onChange={id => updateCircuitEx(ce.id, 'exerciseId', id)} />
+                onChange={id => updateCircuitEx(ce.id, 'exerciseId', id)}
+                onExerciseCreated={onExerciseCreated} />
             </div>
             <button className="btn btn-ghost btn-sm" style={{ color: '#e94560', padding: '4px', flexShrink: 0 }}
               onClick={() => removeCircuitEx(ce.id)}>−</button>
@@ -212,9 +271,15 @@ function CircuitItem({ item, exercises, onUpdate, onRemove, index }) {
 }
 
 function ProgramModal({ prog, onSave, onClose }) {
-  const exercises = getExercises()
+  const [exercises, setExercises] = useState(getExercises)
   const [name, setName] = useState(prog?.name || '')
   const [items, setItems] = useState(prog?.exercises || [])
+
+  function handleExerciseCreated(newEx) {
+    const updated = [...exercises, newEx]
+    saveExercises(updated)
+    setExercises(updated)
+  }
 
   function addExercise() {
     setItems(prev => [...prev, {
@@ -250,37 +315,37 @@ function ProgramModal({ prog, onSave, onClose }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-handle" />
-        <div className="modal-title">{prog ? 'Modifier le programme' : 'Nouveau programme'}</div>
+      <div className="modal-full" onClick={e => e.stopPropagation()}>
 
-        <div className="form-group">
-          <label>Nom du programme *</label>
-          <input value={name} onChange={e => setName(e.target.value)} placeholder="ex: Push A - Lundi" autoFocus />
+        <div className="modal-full-header">
+          <div className="modal-handle" style={{ marginBottom: 12 }} />
+          <div className="modal-title" style={{ marginBottom: 10 }}>
+            {prog ? 'Modifier le programme' : 'Nouveau programme'}
+          </div>
+          <input value={name} onChange={e => setName(e.target.value)}
+            placeholder="Nom du programme (ex: Push A - Lundi)" autoFocus />
         </div>
 
-        <div className="section-title" style={{ marginTop: 16 }}>Exercices & Circuits</div>
+        <div className="modal-full-body">
+          <div className="section-title" style={{ marginTop: 8 }}>Exercices & Circuits</div>
 
-        {items.map((item, i) => item.type === 'circuit' ? (
-          <CircuitItem key={item.id} item={item} exercises={exercises} index={i}
-            onUpdate={updated => updateItem(item.id, updated)}
-            onRemove={() => removeItem(item.id)} />
-        ) : (
-          <ExerciseItem key={item.id} item={item} exercises={exercises} index={i}
-            onUpdate={updated => updateItem(item.id, updated)}
-            onRemove={() => removeItem(item.id)} />
-        ))}
+          {items.map((item, i) => item.type === 'circuit' ? (
+            <CircuitItem key={item.id} item={item} exercises={exercises} index={i}
+              onUpdate={updated => updateItem(item.id, updated)}
+              onRemove={() => removeItem(item.id)}
+              onExerciseCreated={handleExerciseCreated} />
+          ) : (
+            <ExerciseItem key={item.id} item={item} exercises={exercises} index={i}
+              onUpdate={updated => updateItem(item.id, updated)}
+              onRemove={() => removeItem(item.id)}
+              onExerciseCreated={handleExerciseCreated} />
+          ))}
 
-        {exercises.length === 0 ? (
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', padding: 12 }}>
-            Ajoutez d'abord des exercices dans la bibliothèque.
-          </p>
-        ) : (
-          <div className="row" style={{ gap: 8, marginBottom: 16 }}>
+          <div className="row" style={{ gap: 8, marginTop: 4, marginBottom: 8 }}>
             <button className="btn btn-secondary" style={{ flex: 1 }} onClick={addExercise}>+ Exercice</button>
             <button className="btn btn-secondary" style={{ flex: 1, borderColor: '#0f3460', color: '#4da6ff' }} onClick={addCircuit}>⟳ Circuit</button>
           </div>
-        )}
+        </div>
 
         <div className="modal-actions">
           <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose}>Annuler</button>
