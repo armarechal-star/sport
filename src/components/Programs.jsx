@@ -1,11 +1,100 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { getPrograms, savePrograms, getExercises, uid } from '../store'
+
+const CATEGORIES = ['Poitrine', 'Dos', 'Épaules', 'Bras', 'Jambes', 'Abdos', 'Cardio', 'Autre']
 
 const XIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
 )
+
+function ExercisePicker({ exercises, value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [cat, setCat] = useState('Tous')
+  const inputRef = useRef(null)
+  const selected = exercises.find(e => e.id === value)
+
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 50)
+  }, [open])
+
+  const filtered = exercises.filter(e => {
+    const matchCat = cat === 'Tous' || e.category === cat
+    const matchSearch = e.name.toLowerCase().includes(search.toLowerCase())
+    return matchCat && matchSearch
+  })
+
+  function pick(id) {
+    onChange(id)
+    setOpen(false)
+    setSearch('')
+    setCat('Tous')
+  }
+
+  return (
+    <div>
+      <button
+        className="btn btn-secondary"
+        style={{ width: '100%', justifyContent: 'space-between', textAlign: 'left', fontWeight: 400 }}
+        onClick={() => setOpen(true)}
+      >
+        <span style={{ color: selected ? 'var(--text)' : 'var(--text-muted)' }}>
+          {selected ? selected.name : 'Choisir un exercice…'}
+        </span>
+        {selected && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{selected.category}</span>}
+      </button>
+
+      {open && (
+        <div className="modal-overlay" onClick={() => setOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxHeight: '80vh' }}>
+            <div className="modal-handle" />
+            <div className="modal-title" style={{ marginBottom: 10 }}>Choisir un exercice</div>
+
+            <input
+              ref={inputRef}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Rechercher par nom…"
+              style={{ marginBottom: 10 }}
+            />
+
+            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 10, marginBottom: 4 }}>
+              {['Tous', ...CATEGORIES].map(c => (
+                <button key={c} className={`chip ${cat === c ? 'active' : ''}`}
+                  style={{ whiteSpace: 'nowrap' }} onClick={() => setCat(c)}>{c}</button>
+              ))}
+            </div>
+
+            <div style={{ overflowY: 'auto', maxHeight: '45vh' }}>
+              {filtered.length === 0 && (
+                <p style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 16 }}>Aucun résultat</p>
+              )}
+              {filtered.map(ex => (
+                <div key={ex.id}
+                  onClick={() => pick(ex.id)}
+                  style={{
+                    padding: '10px 12px', borderRadius: 8, marginBottom: 4, cursor: 'pointer',
+                    background: ex.id === value ? 'rgba(233,69,96,0.15)' : 'var(--surface2)',
+                    border: '1px solid ' + (ex.id === value ? 'var(--accent)' : 'transparent'),
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  }}>
+                  <span style={{ fontSize: 14, fontWeight: ex.id === value ? 600 : 400 }}>{ex.name}</span>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ex.category}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="modal-actions">
+              <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setOpen(false)}>Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function ExerciseItem({ item, exercises, onUpdate, onRemove, index }) {
   return (
@@ -17,9 +106,8 @@ function ExerciseItem({ item, exercises, onUpdate, onRemove, index }) {
 
       <div className="form-group" style={{ marginBottom: 8 }}>
         <label>Exercice</label>
-        <select value={item.exerciseId} onChange={e => onUpdate({ ...item, exerciseId: e.target.value })}>
-          {exercises.map(ex => <option key={ex.id} value={ex.id}>{ex.name} ({ex.category})</option>)}
-        </select>
+        <ExercisePicker exercises={exercises} value={item.exerciseId}
+          onChange={id => onUpdate({ ...item, exerciseId: id })} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
@@ -98,17 +186,21 @@ function CircuitItem({ item, exercises, onUpdate, onRemove, index }) {
       </div>
 
       {item.circuitExercises.map((ce, ceIdx) => (
-        <div key={ce.id} style={{ display: 'grid', gridTemplateColumns: '1fr 56px 56px 28px', gap: 6, marginBottom: 6, alignItems: 'center' }}>
-          <select value={ce.exerciseId} onChange={e => updateCircuitEx(ce.id, 'exerciseId', e.target.value)}
-            style={{ fontSize: 13, padding: '7px 8px' }}>
-            {exercises.map(ex => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
-          </select>
-          <input className="set-input" value={ce.reps} placeholder="Reps"
-            onChange={e => updateCircuitEx(ce.id, 'reps', e.target.value)} />
-          <input className="set-input" value={ce.weight} placeholder="Kg"
-            onChange={e => updateCircuitEx(ce.id, 'weight', e.target.value)} />
-          <button className="btn btn-ghost btn-sm" style={{ color: '#e94560', padding: '4px' }}
-            onClick={() => removeCircuitEx(ce.id)}>−</button>
+        <div key={ce.id} style={{ marginBottom: 8 }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+            <div style={{ flex: 1 }}>
+              <ExercisePicker exercises={exercises} value={ce.exerciseId}
+                onChange={id => updateCircuitEx(ce.id, 'exerciseId', id)} />
+            </div>
+            <button className="btn btn-ghost btn-sm" style={{ color: '#e94560', padding: '4px', flexShrink: 0 }}
+              onClick={() => removeCircuitEx(ce.id)}>−</button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <input className="set-input" value={ce.reps} placeholder="Reps"
+              onChange={e => updateCircuitEx(ce.id, 'reps', e.target.value)} />
+            <input className="set-input" value={ce.weight} placeholder="Kg"
+              onChange={e => updateCircuitEx(ce.id, 'weight', e.target.value)} />
+          </div>
         </div>
       ))}
 
@@ -190,7 +282,7 @@ function ProgramModal({ prog, onSave, onClose }) {
           </div>
         )}
 
-        <div className="row" style={{ gap: 8, marginTop: 8 }}>
+        <div className="modal-actions">
           <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose}>Annuler</button>
           <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleSave}>Enregistrer</button>
         </div>

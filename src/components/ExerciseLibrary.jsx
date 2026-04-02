@@ -44,7 +44,7 @@ function Modal({ ex, onSave, onClose }) {
           <label>Notes / Conseils techniques</label>
           <textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Points de forme, conseils..." />
         </div>
-        <div className="row" style={{ gap: 8 }}>
+        <div className="modal-actions">
           <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose}>Annuler</button>
           <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleSave}>Enregistrer</button>
         </div>
