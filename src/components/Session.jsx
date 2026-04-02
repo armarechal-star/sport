@@ -186,6 +186,12 @@ export default function Session({ program, onFinish }) {
           )}
         </div>
 
+        {item.programItem.coachNotes ? (
+          <div style={{ background: 'rgba(233,69,96,0.08)', border: '1px solid rgba(233,69,96,0.2)', borderRadius: 8, padding: '8px 10px', marginBottom: 10, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+            💬 {item.programItem.coachNotes}
+          </div>
+        ) : null}
+
         <div className="col-labels">
           <div className="col-label">#</div>
           <div className="col-label">Reps</div>
@@ -282,6 +288,11 @@ export default function Session({ program, onFinish }) {
                       </a>
                     )}
                   </div>
+                  {ce.coachNotes ? (
+                    <div style={{ background: 'rgba(233,69,96,0.08)', border: '1px solid rgba(233,69,96,0.2)', borderRadius: 8, padding: '6px 10px', marginBottom: 6, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                      💬 {ce.coachNotes}
+                    </div>
+                  ) : null}
                   <div className={`set-row ${ce.done ? 'set-done' : ''}`} style={{ marginBottom: 6 }}>
                     <div className="set-num">{ceIdx + 1}</div>
                     <input className="set-input" value={ce.reps} placeholder="10"

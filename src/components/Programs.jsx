@@ -154,7 +154,7 @@ function ExerciseItem({ item, exercises, onUpdate, onRemove, onExerciseCreated, 
           onExerciseCreated={onExerciseCreated} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
         <div>
           <label>Séries</label>
           <input type="number" className="set-input" value={item.sets} min="1"
@@ -175,6 +175,16 @@ function ExerciseItem({ item, exercises, onUpdate, onRemove, onExerciseCreated, 
           <input type="number" className="set-input" value={item.rest} min="0"
             onChange={e => onUpdate({ ...item, rest: parseInt(e.target.value) || 0 })} />
         </div>
+      </div>
+
+      <div>
+        <label>Consignes du coach</label>
+        <textarea
+          value={item.coachNotes || ''}
+          onChange={e => onUpdate({ ...item, coachNotes: e.target.value })}
+          placeholder="Ex: Bien contrôler la descente, pause en bas…"
+          style={{ minHeight: 52, fontSize: 13 }}
+        />
       </div>
     </div>
   )
@@ -240,12 +250,18 @@ function CircuitItem({ item, exercises, onUpdate, onRemove, onExerciseCreated, i
             <button className="btn btn-ghost btn-sm" style={{ color: '#e94560', padding: '4px', flexShrink: 0 }}
               onClick={() => removeCircuitEx(ce.id)}>−</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 4 }}>
             <input className="set-input" value={ce.reps} placeholder="Reps"
               onChange={e => updateCircuitEx(ce.id, 'reps', e.target.value)} />
             <input className="set-input" value={ce.weight} placeholder="Kg"
               onChange={e => updateCircuitEx(ce.id, 'weight', e.target.value)} />
           </div>
+          <textarea
+            value={ce.coachNotes || ''}
+            onChange={e => updateCircuitEx(ce.id, 'coachNotes', e.target.value)}
+            placeholder="Consignes (optionnel)…"
+            style={{ minHeight: 44, fontSize: 12 }}
+          />
         </div>
       ))}
 
