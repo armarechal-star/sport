@@ -1,6 +1,6 @@
 // Simple localStorage-based store
 
-const EXERCISES_VERSION = 2 // Incrémenter pour forcer la mise à jour des exercices par défaut
+const EXERCISES_VERSION = 3 // Incrémenter pour forcer la mise à jour des exercices par défaut
 
 const KEYS = {
   exercises: 'wt_exercises',
@@ -67,6 +67,106 @@ const SAMPLE_EXERCISES = [
   { id: '48', name: 'Rowing machine (ergomètre)', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=H0r_9cYFdSA', notes: 'Jambes puis dos puis bras à la traction' },
   { id: '49', name: 'Vélo elliptique', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=ge3e2fHCB_I', notes: 'Tenir les poignées mobiles, dos droit' },
   { id: '50', name: 'Battle ropes', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=7bKXS5RvUiY', notes: 'Genoux fléchis, alternance rapide des bras' },
+
+  // --- 100 exercices supplémentaires ---
+
+  // Poitrine – machines & bodyweight
+  { id: '51', name: 'Développé couché décliné (barre)', category: 'Poitrine', youtubeUrl: 'https://www.youtube.com/watch?v=LfyQBUKR8SE', notes: 'Tête plus basse que les hanches, cibler le bas pectoraux' },
+  { id: '52', name: 'Écarté haltères couché (flyes)', category: 'Poitrine', youtubeUrl: 'https://www.youtube.com/watch?v=eozdVDA78K0', notes: 'Légère flexion des coudes, grande amplitude' },
+  { id: '53', name: 'Écarté câble incliné (haut pec)', category: 'Poitrine', youtubeUrl: 'https://www.youtube.com/watch?v=Iwe6AmxVf7o', notes: 'Poulies basses, mains rejoignent en haut' },
+  { id: '54', name: 'Pompes (push-up)', category: 'Poitrine', youtubeUrl: 'https://www.youtube.com/watch?v=IODxDxX7oi4', notes: 'Corps gainé, coudes à 45°, descendre la poitrine au sol' },
+  { id: '55', name: 'Pompes inclinées (pieds surélevés)', category: 'Poitrine', youtubeUrl: 'https://www.youtube.com/watch?v=PKGBeXfOGb0', notes: 'Pieds sur un banc, cibler le haut pectoraux' },
+  { id: '56', name: 'Pompes déclinées (mains surélevées)', category: 'Poitrine', youtubeUrl: 'https://www.youtube.com/watch?v=jWxvty2KROs', notes: 'Mains sur un banc, cibler le bas pectoraux' },
+  { id: '57', name: 'Pompes diamant (triceps + pec)', category: 'Poitrine', youtubeUrl: 'https://www.youtube.com/watch?v=J0DXoz-GJu4', notes: 'Mains en triangle sous la poitrine, coudes serrés' },
+
+  // Dos – machines & bodyweight
+  { id: '58', name: 'Soulevé de terre roumain (barre)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=hCDzSR6bW10', notes: 'Dos plat, descente le long des jambes, étirer les ischios' },
+  { id: '59', name: 'Soulevé de terre roumain (haltères)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=jEy_czb3RKA', notes: 'Pieds hip-width, haltères glissent le long des jambes' },
+  { id: '60', name: 'Face pull (câble corde)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=rep-qVOkqgk', notes: 'Poulie haute, tirer vers le visage, coudes en hauteur' },
+  { id: '61', name: 'Tirage vertical prise serrée (câble)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=PfsPmEBEkEQ', notes: 'Prise à la largeur des épaules, tirer vers le sternum' },
+  { id: '62', name: 'Machine iso-lateral tirage dos', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=4BqAFPt8XCQ', notes: 'Travailler bras par bras pour corriger les déséquilibres' },
+  { id: '63', name: 'Tractions australiennes (inverted row)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=dvkIaarnf0g', notes: 'Corps planche, barre à hauteur de hanche, tirer la poitrine' },
+  { id: '64', name: 'Superman (lombaires sol)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=z6PJMT2y8GQ', notes: 'Allongé ventre, soulever bras et jambes simultanément' },
+  { id: '65', name: 'Machine pull-over', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=F3CJ4bFRFXo', notes: 'Étirer au maximum en haut, contracter le grand dorsal en bas' },
+  { id: '66', name: 'Shrugs barre (trapèzes)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=cJRVVxmytaM', notes: 'Monter les épaules vers les oreilles, pause en haut' },
+  { id: '67', name: 'Shrugs haltères (trapèzes)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=g6qbq4Lf1FI', notes: 'Mouvement vertical pur, ne pas rouler les épaules' },
+
+  // Jambes – machines & bodyweight
+  { id: '68', name: 'Squat hack (machine)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=0tn5K9NlCfo', notes: 'Pieds plus avancés pour cibler les fessiers' },
+  { id: '69', name: 'Bulgarian split squat (haltères)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=2C-uNgKwPLE', notes: 'Pied arrière surélevé, genou avant à 90°' },
+  { id: '70', name: 'Step-up (banc, haltères)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=WCFCdxzFBa4', notes: 'Poser tout le pied sur le banc, pousser à travers le talon' },
+  { id: '71', name: 'Glute kickback (machine)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=EDmFBH2YKEM', notes: 'Ne pas cambrer excessivement, contracter le fessier en haut' },
+  { id: '72', name: 'Squat sumo (barre)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=QKKZ9AGYTi4', notes: 'Pieds très écartés, pointes vers l\'extérieur, cibler les adducteurs' },
+  { id: '73', name: 'Fentes marchées (haltères)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=L8fvypPrzzs', notes: 'Alterner les jambes en avançant, tronc vertical' },
+  { id: '74', name: 'Mollets debout (machine)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=gwLzBJYoWlI', notes: 'Amplitude complète, pause étirée en bas' },
+  { id: '75', name: 'Glute bridge (sol, poids corps)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=wPM8icPu6H8', notes: 'Pousser les talons dans le sol, serrer les fessiers en haut' },
+  { id: '76', name: 'Wall sit (isométrique)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=-cdph8hv0O0', notes: 'Dos plaqué au mur, cuisses parallèles au sol' },
+  { id: '77', name: 'Pistol squat (squat unipodal)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=qDcniqddTeE', notes: 'Jambe libre tendue devant, descente contrôlée' },
+  { id: '78', name: 'Nordic curl (ischio sol)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=Tgak2aIHFpU', notes: 'Chevilles bloquées, descente lente en contrôlant avec les ischios' },
+  { id: '79', name: 'Goblet squat (haltère)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=MeIiIdhvXT4', notes: 'Haltère contre la poitrine, coudes entre les genoux en bas' },
+
+  // Épaules – machines & câbles
+  { id: '80', name: 'Élévations latérales (câble)', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=PPf_CSgRn0Y', notes: 'Tension constante vs haltères, câble derrière le dos' },
+  { id: '81', name: 'Élévations frontales (câble)', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=gkrOBMVKFyM', notes: 'Poulie basse, tension continue sur le deltoïde antérieur' },
+  { id: '82', name: 'Machine élévations latérales', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=3VcKaXpzqRo', notes: 'Régler le siège, coudes légèrement fléchis' },
+  { id: '83', name: 'Arnold press (haltères)', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=6Z15_WdXmVw', notes: 'Rotation des paumes de l\'intérieur vers l\'extérieur pendant la montée' },
+  { id: '84', name: 'Oiseau câble (rear delt)', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=ttvADAPAjYA', notes: 'Poulies hautes croisées, tirer en écartant les bras' },
+  { id: '85', name: 'Reverse pec deck (deltoïde post.)', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=wN1HEn0TiEc', notes: 'Écarter les bras vers l\'arrière en gardant les coudes fléchis' },
+  { id: '86', name: 'W-raise haltères (coiffeur)', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=ttvADAPAjYA', notes: 'Buste incliné, coudes à 90°, soulever les avant-bras' },
+
+  // Bras – machines & variantes
+  { id: '87', name: 'Curl incliné (haltères)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=soxrZlIl35U', notes: 'Dos au banc incliné à 60°, coudes derrière le buste pour étirer le biceps' },
+  { id: '88', name: 'Curl concentré (haltère)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=0AUGkch3tzc', notes: 'Coude contre la cuisse, supination complète en haut' },
+  { id: '89', name: 'Curl Scott (banc larry)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=OkiswgALRhk', notes: 'Appuyer les bras sur le coussin, pas d\'élan possible' },
+  { id: '90', name: 'Curl câble prise haute (stretch)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=NFzTWp2qpiE', notes: 'Poulie haute, tirer vers la nuque pour maximiser l\'étirement' },
+  { id: '91', name: 'Extension triceps haltère (1 bras)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=_gsUck-7M74', notes: 'Coude pointé au plafond, baisser l\'haltère dans le dos' },
+  { id: '92', name: 'Extension triceps câble (poulie haute)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=kiuVA0gs3EI', notes: 'Corps légèrement incliné, coudes fixes, extension complète' },
+  { id: '93', name: 'Skull crushers barre EZ', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=d_KZxkY_0cM', notes: 'Couché, baisser la barre vers le front, coudes fixes' },
+  { id: '94', name: 'Close-grip bench press', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=nEF0bEWANhg', notes: 'Prise serrée (épaules), coudes serrés, triceps prioritaires' },
+  { id: '95', name: 'Kickback triceps (haltère)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=6SS6K3lAwZ8', notes: 'Coude fixe, extension complète à l\'horizontale' },
+  { id: '96', name: 'Reverse curl (bras)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=nkNHRzTFJRA', notes: 'Prise pronation (dos de main vers le haut), travaille le brachioradial' },
+
+  // Abdos – poids du corps & câble
+  { id: '97',  name: 'Bicycle crunch', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=9FGilxCbdz8', notes: 'Coude vers genou opposé, alterner lentement' },
+  { id: '98',  name: 'Hollow body hold', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=5HoqhTTFj6o', notes: 'Bas du dos plaqué au sol, jambes tendues, tenir la position' },
+  { id: '99',  name: 'Ab wheel rollout', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=rq2gIG4Pthk', notes: 'À genoux, rouler lentement sans cambrer, revenir avec les abdos' },
+  { id: '100', name: 'Woodchopper câble (obliques)', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=pAplQXzYJxQ', notes: 'Rotation du buste, bras tendus, mouvement diagonal haut-bas' },
+  { id: '101', name: 'Dead bug', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=4XLEnwUr1d8', notes: 'Dos plaqué au sol, alterner bras/jambe opposés lentement' },
+  { id: '102', name: 'Toe touch (crunch jambes tendues)', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=nbBLUvUHBqE', notes: 'Jambes à la verticale, toucher les orteils avec les mains' },
+  { id: '103', name: 'Pallof press (câble anti-rotation)', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=AH_QZLm_0-s', notes: 'Tenir la position, résister à la rotation, gainage total' },
+
+  // Poids du corps / Fonctionnel
+  { id: '104', name: 'Tractions (prise supination, chin-up)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=sIirogA4EPg', notes: 'Prise paumes vers soi, plus facile, plus biceps' },
+  { id: '105', name: 'Tractions prise neutre', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=JKdSMCHnMCo', notes: 'Mains en face à face, moins de sollicitation des coudes' },
+  { id: '106', name: 'Pike push-up (épaules)', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=sposDXWEB0A', notes: 'Fesses en l\'air, tête vers le sol, simule le développé militaire' },
+  { id: '107', name: 'Dips parallèles (poids du corps)', category: 'Bras', youtubeUrl: 'https://www.youtube.com/watch?v=2z8JmcrW-As', notes: 'Corps vertical, coudes serrés, pour les triceps' },
+  { id: '108', name: 'Burpees', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=TU8QYVW0gDU', notes: 'Enchainer squat, pompe et saut, rythme soutenu' },
+  { id: '109', name: 'Jump squat (saut)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=CVaEhXotL7M', notes: 'Descendre à 90°, exploser vers le haut, amortir la réception' },
+  { id: '110', name: 'Box jump (saut sur box)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=52r_Ul5k03g', notes: 'Balancer les bras, atterrir pieds à plat sur la box' },
+  { id: '111', name: 'Mountain climbers', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=nmwgirgXLYM', notes: 'Position de pompe, ramener les genoux vers la poitrine en alternance' },
+  { id: '112', name: 'High knees', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=OAJ_J3EZkdY', notes: 'Courir sur place en montant haut les genoux, bras actifs' },
+  { id: '113', name: 'Inchworm (mobilité)', category: 'Autre', youtubeUrl: 'https://www.youtube.com/watch?v=Slng0CQBzFI', notes: 'Marcher avec les mains jusqu\'à la position de pompe et revenir' },
+  { id: '114', name: 'Bear crawl', category: 'Autre', youtubeUrl: 'https://www.youtube.com/watch?v=S2sGBaI7xpE', notes: 'Avancer sur 4 appuis, genoux à 2 cm du sol, dos plat' },
+  { id: '115', name: 'Renegade row (haltères)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=Bqs23EZgwBE', notes: 'Position de pompe sur haltères, tirer un bras sans rouler les hanches' },
+
+  // Cardio machine
+  { id: '116', name: 'Tapis roulant (course)', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=_kGESn8ArrU', notes: 'Tête droite, bras à 90°, ne pas tenir les barres' },
+  { id: '117', name: 'Vélo stationnaire', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=ge3e2fHCB_I', notes: 'Selle à hauteur de hanche, cadence régulière' },
+  { id: '118', name: 'Corde à sauter', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=FJmRQ5iTXKE', notes: 'Sauts légers, poignets qui tournent, corps gainé' },
+  { id: '119', name: 'Stepper (machine escalier)', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=AvBwSdgLt3E', notes: 'Ne pas s\'appuyer sur les barres, descente contrôlée' },
+
+  // Mobilité & gainage
+  { id: '120', name: 'Planche latérale (gainage)', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=K2KACm2pHiA', notes: 'Corps aligné, hanche ne doit pas tomber, tenir la position' },
+  { id: '121', name: 'Bird dog (gainage)', category: 'Abdos', youtubeUrl: 'https://www.youtube.com/watch?v=wiFNA3sqjCA', notes: 'À 4 pattes, étendre bras et jambe opposés, dos plat' },
+  { id: '122', name: 'Copenhagen plank (adducteurs)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=dHBKMGwz-OI', notes: 'Pied posé sur un banc, lever la hanche, tenir' },
+  { id: '123', name: 'Farmer\'s carry (portés)', category: 'Autre', youtubeUrl: 'https://www.youtube.com/watch?v=rt17lmnaLSM', notes: 'Marcher avec charges lourdes, épaules en arrière, gainage total' },
+  { id: '124', name: 'Turkish get-up (haltère)', category: 'Autre', youtubeUrl: 'https://www.youtube.com/watch?v=0bR6PoHVfzA', notes: 'Mouvement complet du sol debout, bras tendu en permanence' },
+  { id: '125', name: 'Landmine press (barre)', category: 'Épaules', youtubeUrl: 'https://www.youtube.com/watch?v=5pD_TjkMBvY', notes: 'Barre dans un angle, pousser en diagonale, bon pour les épaules fragiles' },
+  { id: '126', name: 'Kettlebell swing', category: 'Autre', youtubeUrl: 'https://www.youtube.com/watch?v=YSxHifyI6s8', notes: 'Poussée des hanches explosive, bras passifs, dos plat' },
+  { id: '127', name: 'Slam ball (médecine ball)', category: 'Cardio', youtubeUrl: 'https://www.youtube.com/watch?v=L1-GtAqhXVE', notes: 'Lever au-dessus de la tête, jeter au sol avec force' },
+  { id: '128', name: 'TRX row (sangles)', category: 'Dos', youtubeUrl: 'https://www.youtube.com/watch?v=dvkIaarnf0g', notes: 'Corps incliné, tirer la poitrine vers les poignées, coudes en arrière' },
+  { id: '129', name: 'TRX push-up (sangles)', category: 'Poitrine', youtubeUrl: 'https://www.youtube.com/watch?v=IODxDxX7oi4', notes: 'Instabilité accrue, gainage renforcé, amplitude contrôlée' },
+  { id: '130', name: 'TRX squat (sangles)', category: 'Jambes', youtubeUrl: 'https://www.youtube.com/watch?v=UBhimrJxAkA', notes: 'Tenir les sangles pour l\'équilibre, descendre profond' },
 ]
 
 function load(key, fallback) {
