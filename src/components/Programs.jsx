@@ -64,7 +64,7 @@ function ExercisePicker({ exercises, value, onChange, onExerciseCreated }) {
       </button>
 
       {open && (
-        <div className="modal-overlay" onClick={() => { setOpen(false); setCreating(false) }}>
+        <div className="modal-overlay-full" onClick={() => { setOpen(false); setCreating(false) }}>
           <div className="modal-full" onClick={e => e.stopPropagation()}>
 
             <div className="modal-full-header">
@@ -314,7 +314,7 @@ function ProgramModal({ prog, onSave, onClose }) {
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay-full" onClick={onClose}>
       <div className="modal-full" onClick={e => e.stopPropagation()}>
 
         <div className="modal-full-header">
