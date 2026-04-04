@@ -196,7 +196,7 @@ function CircuitItem({ item, exercises, onUpdate, onRemove, onExerciseCreated, i
     onUpdate({
       ...item,
       circuitExercises: [...item.circuitExercises, {
-        id: uid(), exerciseId: exercises[0]?.id || '', reps: '10', weight: '',
+        id: uid(), exerciseId: exercises[0]?.id || '', sets: 3, reps: '10', weight: '', rest: 0, coachNotes: '',
       }],
     })
   }
@@ -251,11 +251,27 @@ function CircuitItem({ item, exercises, onUpdate, onRemove, onExerciseCreated, i
             <button className="btn btn-ghost btn-sm" style={{ color: '#e94560', padding: '4px', flexShrink: 0 }}
               onClick={() => removeCircuitEx(ce.id)}>−</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 4 }}>
-            <input className="set-input" value={ce.reps} placeholder="Reps"
-              onChange={e => updateCircuitEx(ce.id, 'reps', e.target.value)} />
-            <input className="set-input" value={ce.weight} placeholder="Kg"
-              onChange={e => updateCircuitEx(ce.id, 'weight', e.target.value)} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6, marginBottom: 4 }}>
+            <div>
+              <label style={{ fontSize: 11 }}>Séries</label>
+              <input type="number" className="set-input" value={ce.sets ?? 3} min="1"
+                onChange={e => updateCircuitEx(ce.id, 'sets', parseInt(e.target.value) || 1)} />
+            </div>
+            <div>
+              <label style={{ fontSize: 11 }}>Reps</label>
+              <input className="set-input" value={ce.reps} placeholder="10"
+                onChange={e => updateCircuitEx(ce.id, 'reps', e.target.value)} />
+            </div>
+            <div>
+              <label style={{ fontSize: 11 }}>Kg</label>
+              <input className="set-input" value={ce.weight} placeholder="—"
+                onChange={e => updateCircuitEx(ce.id, 'weight', e.target.value)} />
+            </div>
+            <div>
+              <label style={{ fontSize: 11 }}>Repos (s)</label>
+              <input type="number" className="set-input" value={ce.rest ?? 0} min="0"
+                onChange={e => updateCircuitEx(ce.id, 'rest', parseInt(e.target.value) || 0)} />
+            </div>
           </div>
           <textarea
             value={ce.coachNotes || ''}

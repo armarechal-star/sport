@@ -49,8 +49,12 @@ function buildSessionData(program) {
         currentRound: 0,
         rounds: Array.from({ length: item.rounds }, () =>
           item.circuitExercises.map(ce => ({
-            id: uid(), exerciseId: ce.exerciseId,
-            reps: ce.reps, weight: ce.weight, done: false,
+            id: uid(),
+            exerciseId: ce.exerciseId,
+            rest: ce.rest ?? 0,
+            sets: Array.from({ length: ce.sets ?? 1 }, () => ({
+              id: uid(), reps: ce.reps, weight: ce.weight || '', done: false,
+            })),
           }))
         ),
       }
@@ -69,12 +73,12 @@ export default function Session({ program, onFinish }) {
   const startTime = useRef(Date.now())
 
   const totalItems = sessionData.reduce((acc, item) => {
-    if (item.type === 'circuit') return acc + item.rounds.flat().length
+    if (item.type === 'circuit') return acc + item.rounds.flat().reduce((s, ce) => s + ce.sets.length, 0)
     return acc + item.sets.length
   }, 0)
 
   const doneItems = sessionData.reduce((acc, item) => {
-    if (item.type === 'circuit') return acc + item.rounds.flat().filter(ce => ce.done).length
+    if (item.type === 'circuit') return acc + item.rounds.flat().reduce((s, ce) => s + ce.sets.filter(s => s.done).length, 0)
     return acc + item.sets.filter(s => s.done).length
   }, 0)
 
@@ -111,21 +115,28 @@ export default function Session({ program, onFinish }) {
 
   // --- Circuit ---
 
-  function updateCircuitEx(exIdx, roundIdx, ceIdx, key, val) {
+  function updateCircuitSet(exIdx, roundIdx, ceIdx, setIdx, key, val) {
     setSessionData(prev => prev.map((item, ei) => ei !== exIdx ? item : {
       ...item,
       rounds: item.rounds.map((round, ri) => ri !== roundIdx ? round :
-        round.map((ce, ci) => ci !== ceIdx ? ce : { ...ce, [key]: val })
+        round.map((ce, ci) => ci !== ceIdx ? ce : {
+          ...ce,
+          sets: ce.sets.map((s, si) => si !== setIdx ? s : { ...s, [key]: val })
+        })
       ),
     }))
   }
 
-  function toggleCircuitEx(exIdx, roundIdx, ceIdx) {
+  function toggleCircuitSet(exIdx, roundIdx, ceIdx, setIdx) {
     const item = sessionData[exIdx]
     const round = item.rounds[roundIdx]
-    const isDone = !round[ceIdx].done
-    const newRound = round.map((ce, ci) => ci === ceIdx ? { ...ce, done: isDone } : ce)
-    const roundComplete = newRound.every(ce => ce.done)
+    const ce = round[ceIdx]
+    const isDone = !ce.sets[setIdx].done
+
+    const newSets = ce.sets.map((s, si) => si === setIdx ? { ...s, done: isDone } : s)
+    const ceAllDone = newSets.every(s => s.done)
+    const newRound = round.map((c, ci) => ci !== ceIdx ? c : { ...c, sets: newSets })
+    const roundComplete = newRound.every(c => c.sets.every(s => s.done))
     const isLastRound = roundIdx === item.programItem.rounds - 1
 
     setSessionData(prev => prev.map((it, ei) => {
@@ -135,7 +146,12 @@ export default function Session({ program, onFinish }) {
       return { ...it, rounds: newRounds, currentRound: newCurrentRound }
     }))
 
-    if (isDone && roundComplete && !isLastRound && item.programItem.rest > 0) {
+    // Timer repos exercice (entre séries ou avant prochain exo)
+    if (isDone && ceAllDone && ce.rest > 0) {
+      setTimer({ seconds: ce.rest })
+    }
+    // Timer repos inter-tours
+    if (isDone && roundComplete && !isLastRound && item.programItem.rest > 0 && ce.rest === 0) {
       setTimer({ seconds: item.programItem.rest })
     }
   }
@@ -275,12 +291,14 @@ export default function Session({ program, onFinish }) {
 
             {currentRoundData.map((ce, ceIdx) => {
               const exercise = ex(ce.exerciseId)
+              const ceAllDone = ce.sets.every(s => s.done)
               return (
-                <div key={ce.id}>
+                <div key={ce.id} style={{ marginBottom: 10 }}>
                   <div className="row-between" style={{ marginBottom: 4 }}>
                     <div className="row" style={{ gap: 6 }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>{exercise?.name || '?'}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: ceAllDone ? 'var(--success)' : 'var(--text)' }}>{exercise?.name || '?'}</span>
                       <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{exercise?.category}</span>
+                      {ce.rest > 0 && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>· Repos {ce.rest}s</span>}
                     </div>
                     {exercise?.youtubeUrl && (
                       <a href={exercise.youtubeUrl} target="_blank" rel="noopener noreferrer" className="yt-btn">
@@ -293,17 +311,21 @@ export default function Session({ program, onFinish }) {
                       💬 {ce.coachNotes}
                     </div>
                   ) : null}
-                  <div className={`set-row ${ce.done ? 'set-done' : ''}`} style={{ marginBottom: 6 }}>
-                    <div className="set-num">{ceIdx + 1}</div>
-                    <input className="set-input" value={ce.reps} placeholder="10"
-                      onChange={e => updateCircuitEx(exIdx, currentRound, ceIdx, 'reps', e.target.value)} />
-                    <input className="set-input" value={ce.weight} placeholder="—" type="number"
-                      onChange={e => updateCircuitEx(exIdx, currentRound, ceIdx, 'weight', e.target.value)} />
-                    <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-muted)' }}>—</div>
-                    <button className="btn btn-sm"
-                      style={{ background: ce.done ? 'var(--success)' : 'var(--surface2)', color: ce.done ? 'white' : 'var(--text-muted)', border: '1px solid ' + (ce.done ? 'var(--success)' : '#2a2a4a'), padding: '6px 8px' }}
-                      onClick={() => toggleCircuitEx(exIdx, currentRound, ceIdx)}>✓</button>
-                  </div>
+                  {ce.sets.map((set, setIdx) => (
+                    <div key={set.id} className={`set-row ${set.done ? 'set-done' : ''}`} style={{ marginBottom: 4 }}>
+                      <div className="set-num">{setIdx + 1}</div>
+                      <input className="set-input" value={set.reps} placeholder="10"
+                        onChange={e => updateCircuitSet(exIdx, currentRound, ceIdx, setIdx, 'reps', e.target.value)} />
+                      <input className="set-input" value={set.weight} placeholder="—" type="number"
+                        onChange={e => updateCircuitSet(exIdx, currentRound, ceIdx, setIdx, 'weight', e.target.value)} />
+                      <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-muted)' }}>
+                        {ce.rest > 0 ? `${ce.rest}s` : '—'}
+                      </div>
+                      <button className="btn btn-sm"
+                        style={{ background: set.done ? 'var(--success)' : 'var(--surface2)', color: set.done ? 'white' : 'var(--text-muted)', border: '1px solid ' + (set.done ? 'var(--success)' : '#2a2a4a'), padding: '6px 8px' }}
+                        onClick={() => toggleCircuitSet(exIdx, currentRound, ceIdx, setIdx)}>✓</button>
+                    </div>
+                  ))}
                 </div>
               )
             })}
